@@ -3,25 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus AI | Dashboard</title>
+    <title>Nexus AI | Lapac009-CTRL</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --bg-color: #0a0a0a;
+            --bg-color: #0d0d0d;
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
             --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            --text-main: #e5e7eb;
+            --text-main: #f3f4f6;
             --text-muted: #9ca3af;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
         body {
             background-color: var(--bg-color);
@@ -31,34 +26,27 @@
             align-items: center;
             height: 100vh;
             overflow: hidden;
-            /* Suptilni gradient krugovi u pozadini */
             background-image: 
-                radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 40%);
+                radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.1) 0%, transparent 35%),
+                radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.1) 0%, transparent 35%);
         }
 
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 750px;
             padding: 20px;
-            text-align: center;
-            animation: fadeIn 0.8s ease-out;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.6s ease-out;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .header {
-            margin-bottom: 40px;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .header h1 {
-            font-size: 3rem;
-            font-weight: 600;
+            text-align: center;
+            font-size: 2.8rem;
+            margin-bottom: 25px;
             letter-spacing: -1px;
-            margin-bottom: 10px;
         }
 
         .gradient-text {
@@ -67,97 +55,104 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Search / Input Box */
-        .search-wrapper {
+        /* Chat Area */
+        #chat-window {
+            height: 350px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        #chat-window::-webkit-scrollbar { width: 4px; }
+        #chat-window::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+
+        .msg {
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 85%;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            animation: msgPop 0.3s ease-out;
+        }
+
+        @keyframes msgPop { from { opacity: 0; scale: 0.95; } to { opacity: 1; scale: 1; } }
+
+        .user-msg {
+            align-self: flex-end;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: #c7d2fe;
+        }
+
+        .ai-msg {
+            align-self: flex-start;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+        }
+
+        /* Search Box */
+        .input-area {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             backdrop-filter: blur(20px);
-            border-radius: 28px;
-            padding: 12px 24px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            margin-bottom: 30px;
+            border-radius: 24px;
+            padding: 15px 20px;
+            transition: 0.3s;
         }
 
-        .search-wrapper:focus-within {
+        .input-area:focus-within {
             border-color: rgba(99, 102, 241, 0.5);
-            box-shadow: 0 0 30px rgba(99, 102, 241, 0.15);
-            transform: scale(1.01);
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.1);
         }
 
-        .search-main {
+        .input-row {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
-        .search-main input {
+        input {
             background: transparent;
             border: none;
             outline: none;
             color: white;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             width: 100%;
-            padding: 10px 0;
         }
 
-        .search-footer {
+        .footer-tools {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
+            margin-top: 12px;
             padding-top: 10px;
             border-top: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .model-info {
             font-size: 0.8rem;
             color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
 
-        /* Buttons / Chips */
-        .chip-group {
+        .chips {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         .chip {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            color: var(--text-muted);
-            padding: 10px 20px;
-            border-radius: 16px;
+            padding: 7px 15px;
+            border-radius: 12px;
+            font-size: 0.85rem;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            transition: 0.2s;
+            color: var(--text-muted);
         }
 
-        .chip:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .chip.active {
-            background: rgba(99, 102, 241, 0.1);
-            border-color: #6366f1;
-            color: #818cf8;
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            .header h1 { font-size: 2rem; }
-            .chip-group { gap: 8px; }
-        }
+        .chip:hover { background: rgba(255,255,255,0.08); color: white; }
     </style>
 </head>
 <body>
@@ -165,38 +160,68 @@
     <div class="container">
         <div class="header">
             <h1>Evening, <span class="gradient-text">developer</span></h1>
-            <p style="color: var(--text-muted);">How can I help your project today?</p>
         </div>
 
-        <div class="search-wrapper">
-            <div class="search-main">
+        <div id="chat-window">
+            <div class="msg ai-msg">Zdravo! Ja sam tvoj AI asistent. Kako ti mogu pomoći danas?</div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-row">
                 <i data-lucide="sparkles" style="color: #a855f7; width: 20px;"></i>
-                <input type="text" placeholder="Type / for skills or ask anything...">
+                <input type="text" id="userInput" placeholder="Pitaj nešto ili kucaj / za komande..." autocomplete="off">
             </div>
-            <div class="search-footer">
-                <div class="model-info">
-                    <i data-lucide="cpu" style="width: 14px;"></i>
-                    Nexus AI 4.6 Pro
-                </div>
-                <div style="display: flex; gap: 15px; color: var(--text-muted);">
-                    <i data-lucide="mic" style="width: 18px; cursor: pointer;"></i>
-                    <i data-lucide="paperclip" style="width: 18px; cursor: pointer;"></i>
+            <div class="footer-tools">
+                <span><i data-lucide="cpu" style="width: 12px; vertical-align: middle;"></i> Nexus 4.6 Engine</span>
+                <div style="display:flex; gap: 10px;">
+                    <i data-lucide="mic" style="width: 16px; cursor:pointer"></i>
+                    <i data-lucide="image" style="width: 16px; cursor:pointer"></i>
                 </div>
             </div>
         </div>
 
-        <div class="chip-group">
-            <div class="chip"><i data-lucide="zap" style="width: 16px;"></i> Choice</div>
-            <div class="chip"><i data-lucide="pen-tool" style="width: 16px;"></i> Write</div>
-            <div class="chip"><i data-lucide="book-open" style="width: 16px;"></i> Learn</div>
-            <div class="chip active"><i data-lucide="code-2" style="width: 16px;"></i> Code</div>
-            <div class="chip"><i data-lucide="coffee" style="width: 16px;"></i> Stuff</div>
+        <div class="chips">
+            <div class="chip">Optimization</div>
+            <div class="chip">UI Design</div>
+            <div class="chip">Refactor</div>
         </div>
     </div>
 
     <script>
-        // Inicijalizacija Lucide ikonica
         lucide.createIcons();
+        const input = document.getElementById('userInput');
+        const window = document.getElementById('chat-window');
+
+        function addMsg(text, type) {
+            const div = document.createElement('div');
+            div.className = `msg ${type}-msg`;
+            div.innerText = text;
+            window.appendChild(div);
+            window.scrollTop = window.scrollHeight;
+        }
+
+        function getResponse(txt) {
+            const val = txt.toLowerCase();
+            if(val.includes("zdravo")) return "Pozdrav! Šta kodiramo danas?";
+            if(val.includes("ko si ti")) return "Ja sam Nexus AI, tvoj lični asistent napravljen za brz rad i moderan dizajn.";
+            if(val.includes("roblox")) return "Roblox? Odlično. Treba li ti pomoć oko Luau skripte ili možda neki novi GUI?";
+            if(val.includes("hvala")) return "Nema na čemu! Tu sam ako zatreba još nešto.";
+            if(val.includes("error") || val.includes("bug")) return "Pokaži mi kod, rešićemo taj bag za čas!";
+            return "Zanimljivo razmišljanje. Reci mi više detalja o tome kako bih mogao preciznije da ti pomognem.";
+        }
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && input.value.trim() !== "") {
+                const userTxt = input.value;
+                addMsg(userTxt, 'user');
+                input.value = "";
+
+                setTimeout(() => {
+                    const aiTxt = getResponse(userTxt);
+                    addMsg(aiTxt, 'ai');
+                }, 800);
+            }
+        });
     </script>
 </body>
 </html>
