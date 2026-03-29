@@ -3,116 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus AI | Lapac009-CTRL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <title>Nexus AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0d0d0d;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
+            --bg: #121212;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+            --accent: #a8c0ff;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Inter', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
             overflow: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.1) 0%, transparent 35%),
-                radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.1) 0%, transparent 35%);
         }
 
-        .container {
+        .main-wrapper {
             width: 100%;
-            max-width: 750px;
+            max-width: 650px;
             padding: 20px;
             display: flex;
             flex-direction: column;
-            animation: fadeIn 0.6s ease-out;
+            align-items: center;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .header h1 {
-            text-align: center;
-            font-size: 2.8rem;
-            margin-bottom: 25px;
-            letter-spacing: -1px;
+        /* Naslov kao sa tvoje slike */
+        .header-text {
+            font-size: 3rem;
+            margin-bottom: 40px;
+            font-weight: 300;
+            transition: 0.5s ease;
         }
 
-        .gradient-text {
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .header-text span { color: #d1d5db; }
+        .orange-star { color: #ff8c69; margin-right: 10px; }
 
-        /* Chat Area */
+        /* Chat prozor koji je na početku nevidljiv */
         #chat-window {
-            height: 350px;
+            width: 100%;
+            height: 0;
+            opacity: 0;
             overflow-y: auto;
-            margin-bottom: 20px;
-            padding-right: 10px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 15px;
+            margin-bottom: 20px;
+            transition: all 0.5s ease;
+            padding: 0 10px;
         }
 
-        #chat-window::-webkit-scrollbar { width: 4px; }
-        #chat-window::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+        #chat-window.active {
+            height: 300px;
+            opacity: 1;
+        }
 
         .msg {
-            padding: 12px 18px;
-            border-radius: 18px;
-            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 15px;
+            max-width: 80%;
             font-size: 0.95rem;
-            line-height: 1.5;
-            animation: msgPop 0.3s ease-out;
+            line-height: 1.4;
+            backdrop-filter: blur(10px);
         }
-
-        @keyframes msgPop { from { opacity: 0; scale: 0.95; } to { opacity: 1; scale: 1; } }
 
         .user-msg {
             align-self: flex-end;
-            background: rgba(99, 102, 241, 0.15);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            color: #c7d2fe;
+            background: rgba(168, 192, 255, 0.1);
+            border: 1px solid rgba(168, 192, 255, 0.2);
         }
 
         .ai-msg {
             align-self: flex-start;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
+            background: var(--glass);
+            border: 1px solid var(--border);
         }
 
-        /* Search Box */
-        .input-area {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
+        /* Input polje - Glassmorphism */
+        .input-container {
+            background: var(--glass);
+            border: 1px solid var(--border);
             backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 15px 20px;
+            border-radius: 20px;
+            padding: 18px 25px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
             transition: 0.3s;
-        }
-
-        .input-area:focus-within {
-            border-color: rgba(99, 102, 241, 0.5);
-            box-shadow: 0 0 25px rgba(99, 102, 241, 0.1);
-        }
-
-        .input-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
         }
 
         input {
@@ -120,105 +102,106 @@
             border: none;
             outline: none;
             color: white;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             width: 100%;
+            font-family: inherit;
         }
 
-        .footer-tools {
+        .input-footer {
             display: flex;
             justify-content: space-between;
-            margin-top: 12px;
-            padding-top: 10px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.8rem;
-            color: var(--text-muted);
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.85rem;
         }
 
+        /* Dugmići (Chips) */
         .chips {
             display: flex;
-            justify-content: center;
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 25px;
+            transition: 0.3s;
         }
 
         .chip {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            padding: 7px 15px;
-            border-radius: 12px;
+            background: transparent;
+            border: 1px solid #333;
+            color: #999;
+            padding: 8px 16px;
+            border-radius: 10px;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: 0.2s;
-            color: var(--text-muted);
         }
 
-        .chip:hover { background: rgba(255,255,255,0.08); color: white; }
+        .chip:hover { border-color: #555; color: white; }
+
+        /* Sakrivanje naslova kada krene chat */
+        .mini-header { font-size: 1.5rem !important; margin-bottom: 10px !important; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
-            <h1>Evening, <span class="gradient-text">developer</span></h1>
-        </div>
+    <div class="main-wrapper">
+        <h1 class="header-text" id="main-title"><span class="orange-star">✳</span>Evening, <span>bilider</span></h1>
 
-        <div id="chat-window">
-            <div class="msg ai-msg">Zdravo! Ja sam tvoj AI asistent. Kako ti mogu pomoći danas?</div>
-        </div>
+        <div id="chat-window"></div>
 
-        <div class="input-area">
-            <div class="input-row">
-                <i data-lucide="sparkles" style="color: #a855f7; width: 20px;"></i>
-                <input type="text" id="userInput" placeholder="Pitaj nešto ili kucaj / za komande..." autocomplete="off">
-            </div>
-            <div class="footer-tools">
-                <span><i data-lucide="cpu" style="width: 12px; vertical-align: middle;"></i> Nexus 4.6 Engine</span>
-                <div style="display:flex; gap: 10px;">
-                    <i data-lucide="mic" style="width: 16px; cursor:pointer"></i>
-                    <i data-lucide="image" style="width: 16px; cursor:pointer"></i>
-                </div>
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Type / for skills" autocomplete="off">
+            <div class="input-footer">
+                <span>Sonnet 4.6</span>
+                <span>|||</span>
             </div>
         </div>
 
-        <div class="chips">
-            <div class="chip">Optimization</div>
-            <div class="chip">UI Design</div>
-            <div class="chip">Refactor</div>
+        <div class="chips" id="chip-box">
+            <button class="chip">Write</button>
+            <button class="chip">Learn</button>
+            <button class="chip">Code</button>
+            <button class="chip">Life stuff</button>
         </div>
     </div>
 
     <script>
-        lucide.createIcons();
         const input = document.getElementById('userInput');
-        const window = document.getElementById('chat-window');
+        const chatWin = document.getElementById('chat-window');
+        const title = document.getElementById('main-title');
+        const chipBox = document.getElementById('chip-box');
 
-        function addMsg(text, type) {
+        function addMessage(text, isUser) {
             const div = document.createElement('div');
-            div.className = `msg ${type}-msg`;
+            div.className = `msg ${isUser ? 'user-msg' : 'ai-msg'}`;
             div.innerText = text;
-            window.appendChild(div);
-            window.scrollTop = window.scrollHeight;
+            chatWin.appendChild(div);
+            chatWin.scrollTop = chatWin.scrollHeight;
         }
 
-        function getResponse(txt) {
-            const val = txt.toLowerCase();
-            if(val.includes("zdravo")) return "Pozdrav! Šta kodiramo danas?";
-            if(val.includes("ko si ti")) return "Ja sam Nexus AI, tvoj lični asistent napravljen za brz rad i moderan dizajn.";
-            if(val.includes("roblox")) return "Roblox? Odlično. Treba li ti pomoć oko Luau skripte ili možda neki novi GUI?";
-            if(val.includes("hvala")) return "Nema na čemu! Tu sam ako zatreba još nešto.";
-            if(val.includes("error") || val.includes("bug")) return "Pokaži mi kod, rešićemo taj bag za čas!";
-            return "Zanimljivo razmišljanje. Reci mi više detalja o tome kako bih mogao preciznije da ti pomognem.";
+        function getAIResponse(text) {
+            const val = text.toLowerCase();
+            if(val.includes("zdravo")) return "Zdravo bilideru! Kako mogu da ti pomognem danas?";
+            if(val.includes("ko si ti")) return "Ja sam tvoj personalizovani AI asistent.";
+            if(val.includes("roblox")) return "Vidim da te zanima Roblox. Da li radimo na nekom novom Luau skriptu?";
+            if(val.includes("mamba")) return "Mamba Roleplay projekat izgleda odlično, nastavi tako!";
+            return "Razumem. Možeš li mi reći nešto više o tome?";
         }
 
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && input.value.trim() !== "") {
-                const userTxt = input.value;
-                addMsg(userTxt, 'user');
+                const text = input.value;
+                
+                // Aktiviraj chat mod (promeni UI)
+                chatWin.classList.add('active');
+                title.classList.add('mini-header');
+                chipBox.style.opacity = "0"; // Skloni dugmiće da ne smetaju
+
+                // Dodaj poruku korisnika
+                addMessage(text, true);
                 input.value = "";
 
+                // AI Odgovor
                 setTimeout(() => {
-                    const aiTxt = getResponse(userTxt);
-                    addMsg(aiTxt, 'ai');
+                    const response = getAIResponse(text);
+                    addMessage(response, false);
                 }, 800);
             }
         });
