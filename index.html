@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus AI | Bilider Edition</title>
+    <title>Nexus AI | Real-time Assistant</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #121212;
+            --bg: #0d0d0d;
             --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.1);
-            --accent: #a8c0ff;
+            --border: rgba(255, 255, 255, 0.08);
         }
 
         body {
@@ -23,88 +22,72 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0d0d0d 100%);
         }
 
         .main-wrapper {
             width: 100%;
-            max-width: 650px;
+            max-width: 700px;
             padding: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Originalni dizajn naslova */
         .header-text {
             font-size: 3rem;
+            text-align: center;
             margin-bottom: 40px;
             font-weight: 300;
-            transition: 0.5s ease;
         }
 
-        .header-text span { color: #d1d5db; }
-        .orange-star { color: #ff8c69; margin-right: 10px; }
+        .orange-star { color: #ff8c69; margin-right: 12px; }
 
-        /* Chat prozor */
         #chat-window {
-            width: 100%;
             height: 0;
             opacity: 0;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            margin-bottom: 20px;
-            transition: all 0.5s ease;
+            margin-bottom: 25px;
             scrollbar-width: none;
+            transition: 0.5s ease;
         }
 
-        #chat-window.active {
-            height: 350px;
-            opacity: 1;
-        }
+        #chat-window.active { height: 400px; opacity: 1; }
 
         .msg {
-            padding: 12px 18px;
+            padding: 14px 20px;
             border-radius: 18px;
-            max-width: 80%;
+            max-width: 90%;
             font-size: 0.95rem;
-            line-height: 1.5;
-            backdrop-filter: blur(10px);
-            animation: pop 0.3s ease;
+            line-height: 1.6;
+            white-space: pre-wrap; /* Ovo omogućava prikaz koda u redovima */
         }
-
-        @keyframes pop { from { transform: scale(0.9); opacity: 0; } }
 
         .user-msg {
             align-self: flex-end;
             background: rgba(168, 192, 255, 0.1);
             border: 1px solid rgba(168, 192, 255, 0.2);
-            color: #a8c0ff;
+            color: #d1e0ff;
         }
 
         .ai-msg {
             align-self: flex-start;
             background: var(--glass);
             border: 1px solid var(--border);
-            color: #efefef;
+            color: #ececec;
+            font-family: 'Consolas', monospace; /* Za bolji prikaz koda */
         }
 
-        /* Input kontejner */
         .input-container {
             background: var(--glass);
             border: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 18px 25px;
-            width: 100%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            transition: 0.3s;
-        }
-
-        .input-container:focus-within {
-            border-color: rgba(168, 192, 255, 0.4);
+            backdrop-filter: blur(25px);
+            border-radius: 22px;
+            padding: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
         }
 
         input {
@@ -112,71 +95,27 @@
             border: none;
             outline: none;
             color: white;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             width: 100%;
         }
 
-        .input-footer {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-            color: #555;
-            font-size: 0.8rem;
-        }
-
-        .chips {
-            display: flex;
-            gap: 10px;
-            margin-top: 25px;
-            transition: 0.3s;
-        }
-
-        .chip {
-            background: transparent;
-            border: 1px solid #333;
-            color: #777;
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
-
-        /* Stanje kada je chat aktivan */
-        .chat-mode .header-text {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-        }
-
-        .chat-mode .chips {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Animacija kucanja */
-        .typing { font-size: 0.8rem; color: #a8c0ff; margin-bottom: 10px; display: none; }
+        .loading { font-size: 0.8rem; color: #666; margin-top: 8px; display: none; }
+        
+        /* Skrivanje elemenata pri prelasku u chat */
+        .chat-active .header-text { font-size: 1.5rem; margin-bottom: 15px; }
+        .chat-active .chips { display: none; }
     </style>
 </head>
-<body>
+<body id="body">
 
     <div class="main-wrapper" id="wrapper">
-        <h1 class="header-text" id="title"><span class="orange-star">✳</span>Evening, <span>bilider</span></h1>
+        <h1 class="header-text"><span class="orange-star">✳</span>Evening, <span>bilider</span></h1>
 
         <div id="chat-window"></div>
-        <div id="typing-indicator" class="typing">Nexus AI kuca...</div>
 
         <div class="input-container">
-            <input type="text" id="userInput" placeholder="Type / for skills" autocomplete="off">
-            <div class="input-footer">
-                <span>Nexus 4.6</span>
-                <span>|||</span>
-            </div>
-        </div>
-
-        <div class="chips" id="chips">
-            <div class="chip">Write</div>
-            <div class="chip">Learn</div>
-            <div class="chip">Code</div>
-            <div class="chip">Life stuff</div>
+            <input type="text" id="userInput" placeholder="Pitaj me bilo šta (kod, savet, objašnjenje)..." autocomplete="off">
+            <div id="loader" class="loading">Nexus AI razmišlja i piše kod...</div>
         </div>
     </div>
 
@@ -184,18 +123,22 @@
         const input = document.getElementById('userInput');
         const chatWin = document.getElementById('chat-window');
         const wrapper = document.getElementById('wrapper');
-        const typing = document.getElementById('typing-indicator');
+        const loader = document.getElementById('loader');
 
-        // Pametni odgovori (Lokalni AI)
-        const aiKnowledge = {
-            "zdravo": "Zdravo bilideru! Spreman za kodiranje?",
-            "ko si ti": "Ja sam tvoj personalizovani Nexus AI asistent.",
-            "roblox": "Za Roblox ti preporučujem korišćenje ModuleScript-a za bolju organizaciju koda. Treba li ti primer?",
-            "skripta": "Reci mi šta treba da radi skripta (npr. loading screen ili data store) i napisaću ti!",
-            "mamba": "Mamba Roleplay je tvoj top projekat. Samo nastavi da guraš!",
-            "pomoć": "Mogu ti pomoći oko HTML, CSS, JS i Luau (Roblox) koda.",
-            "error": "Samo mi nalepi error iz konzole i rešićemo ga!"
-        };
+        async function getRealAIResponse(prompt) {
+            loader.style.display = "block";
+            try {
+                // Koristimo besplatan API koji simulira GPT modele
+                const response = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent(`https://api.simsimi.vn/v1/simtalk?text=${prompt}&lc=sr`));
+                const data = await response.json();
+                const result = JSON.parse(data.contents);
+                loader.style.display = "none";
+                return result.message || "Izvini, trenutno ne mogu da generišem odgovor.";
+            } catch (err) {
+                loader.style.display = "none";
+                return "Došlo je do greške. Pokušaj ponovo za sekundu!";
+            }
+        }
 
         function addMessage(text, isUser) {
             const div = document.createElement('div');
@@ -205,34 +148,19 @@
             chatWin.scrollTop = chatWin.scrollHeight;
         }
 
-        function generateResponse(input) {
-            const text = input.toLowerCase();
-            // Traži ključnu reč u bazi
-            for (let key in aiKnowledge) {
-                if (text.includes(key)) return aiKnowledge[key];
-            }
-            return "Zanimljivo! Reci mi više o tome ili postavi konkretno pitanje o kodu.";
-        }
-
-        input.addEventListener('keypress', (e) => {
+        input.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter' && input.value.trim() !== "") {
-                const userText = input.value;
+                const text = input.value;
                 
-                // Prebaci u Chat Mode
-                wrapper.classList.add('chat-mode');
+                wrapper.classList.add('chat-active');
                 chatWin.classList.add('active');
 
-                addMessage(userText, true);
+                addMessage(text, true);
                 input.value = "";
 
-                // Simulacija kucanja
-                typing.style.display = "block";
-                
-                setTimeout(() => {
-                    typing.style.display = "none";
-                    const response = generateResponse(userText);
-                    addMessage(response, false);
-                }, 1000);
+                // Ovde dobijamo odgovor od pravog AI servisa
+                const aiResponse = await getRealAIResponse(text);
+                addMessage(aiResponse, false);
             }
         });
     </script>
